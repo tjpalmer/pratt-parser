@@ -18,30 +18,30 @@ enum Op {
     Divide
 }
 
-fn parse(tokens: Vec<Token>) -> Result<Expr, &'static str> {
+fn parse(tokens: Vec<Token>) -> Result<Expr, String> {
     let mut it = tokens.iter().peekable();
     parse_expr(&mut it, 0)
 }
 
-fn parse_expr<'a, It>(it: &mut Peekable<It>, precendence: u8) -> Result<Expr, &'static str>
+fn parse_expr<'a, It>(it: &mut Peekable<It>, precendence: u8) -> Result<Expr, String>
     where It: Iterator<Item=&'a Token> {
 
     parse_prefix(it)
 }
 
-fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, &'static str>
+fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, String>
     where It: Iterator<Item=&'a Token> {
 
     match it.peek() {
         Some(&t) => match t {
             &Token::Integer(n) => Ok(Expr::Integer(n)),
-            _ => Err("TBD")
+            _ => Err(format!("unexpected token: {:?}", t))
         },
-        None => Err("no more tokens")
+        None => Err(String::from("No more tokens"))
     }
 }
 
-fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>) -> Result<Expr, &'static str>
+fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>) -> Result<Expr, String>
     where It: Iterator<Item=&'a Token> {
 
     match it.peek() {
@@ -62,9 +62,9 @@ fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>) -> Result<Expr, &'stat
                     op,
                     Box::new(right)))
             },
-            _ => Err("safasf")
+            _ => Err(format!("Unexpected token {:?}", t))
         },
-        None => Err("sdfdsafa")
+        None => Err(String::from("No more tokens"))
     }
 
 }
