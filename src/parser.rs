@@ -20,8 +20,13 @@ enum Op {
 
 fn parse(tokens: Vec<Token>) -> Result<Expr, &'static str> {
     let mut it = tokens.iter().peekable();
-    parse_prefix(&mut it);
-    Err("not implemented yet")
+    parse_expr(&mut it, 0)
+}
+
+fn parse_expr<'a, It>(it: &mut Peekable<It>, precendence: u8) -> Result<Expr, &'static str>
+    where It: Iterator<Item=&'a Token> {
+
+    parse_prefix(it)
 }
 
 fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, &'static str>
@@ -35,7 +40,31 @@ fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, &'static str>
         None => Err("no more tokens")
     }
 }
-//
-// fn parse_infix() -> Result<Expr, &'static str> {
-//     Err("not implemented yet")
-// }
+
+fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>) -> Result<Expr, &'static str>
+    where It: Iterator<Item=&'a Token> {
+
+    match it.peek() {
+        Some(&t) => match t {
+            &Token::Operator(ref s) => {
+
+                let op = match s {
+                    &Symbol::Add => Op::Add,
+                    &Symbol::Subtract => Op::Subtract,
+                    &Symbol::Multiply => Op::Multiply,
+                    &Symbol::Divide => Op::Divide,
+                };
+
+                let right = parse_expr(it, 0).unwrap();
+
+                Ok(Expr::BinaryExpr(
+                    Box::new(left),
+                    op,
+                    Box::new(right)))
+            },
+            _ => Err("safasf")
+        },
+        None => Err("sdfdsafa")
+    }
+
+}
