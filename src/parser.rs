@@ -36,10 +36,7 @@ fn parse_expr<'a, It>(it: &mut Peekable<It>, precedence: u8) -> Result<Expr, Str
         println!("next_token = {:?}", next_token);
 
         let next_precedence = match next_token {
-            &Token::Operator(ref symbol) => match symbol {
-                &Symbol::Add | &Symbol::Subtract => 10,
-                &Symbol::Multiply | &Symbol::Divide => 20,
-            },
+            &Token::Operator(ref symbol) => get_precedence(symbol),
             _ => panic!("Expected operator after expr")
         };
 
@@ -53,8 +50,11 @@ fn parse_expr<'a, It>(it: &mut Peekable<It>, precedence: u8) -> Result<Expr, Str
     Ok(expr)
 }
 
-fn get_precedence() -> u8 {
-    0
+fn get_precedence(symbol: &Symbol) -> u8 {
+    match symbol {
+        &Symbol::Add | &Symbol::Subtract => 10,
+        &Symbol::Multiply | &Symbol::Divide => 20,
+    }
 }
 
 fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, String>
