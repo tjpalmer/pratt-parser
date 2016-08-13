@@ -19,6 +19,13 @@ pub enum Op {
     Divide
 }
 
+fn get_precedence(symbol: &Symbol) -> u8 {
+    match symbol {
+        &Symbol::Add | &Symbol::Subtract => 10,
+        &Symbol::Multiply | &Symbol::Divide => 20,
+    }
+}
+
 pub fn parse(tokens: Vec<Token>) -> Result<Expr, String> {
     let mut it = tokens.iter().peekable();
     parse_expr(&mut it, 0)
@@ -27,13 +34,13 @@ pub fn parse(tokens: Vec<Token>) -> Result<Expr, String> {
 fn parse_expr<'a, It>(it: &mut Peekable<It>, precedence: u8) -> Result<Expr, String>
     where It: Iterator<Item=&'a Token> {
 
-    let mut expr = parse_prefix(it).unwrap();
+    println!("parse_expr() calling parse_prefix()");
 
-    println!("parsed {:?}", expr);
+    let mut expr = parse_prefix(it).unwrap();
 
     while let Some(&next_token) = it.peek() {
 
-        println!("next_token = {:?}", next_token);
+        println!("parse_expr() left = {:?}", expr);
 
         let next_precedence = match next_token {
             &Token::Operator(ref symbol) => get_precedence(symbol),
@@ -41,20 +48,18 @@ fn parse_expr<'a, It>(it: &mut Peekable<It>, precedence: u8) -> Result<Expr, Str
         };
 
         if precedence >= next_precedence {
+            println!("parse_expr() breaking out of loop due to precedence change");
             break;
         }
+
+        println!("parse_expr() calling parse_infix()");
 
         expr = parse_infix(expr, it, next_precedence).unwrap();
     }
 
-    Ok(expr)
-}
+    println!("parse_expr() returning {:?}", expr);
 
-fn get_precedence(symbol: &Symbol) -> u8 {
-    match symbol {
-        &Symbol::Add | &Symbol::Subtract => 10,
-        &Symbol::Multiply | &Symbol::Divide => 20,
-    }
+    Ok(expr)
 }
 
 fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, String>
@@ -88,6 +93,8 @@ fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>, precendence: u8) -> Re
 
                 it.next().unwrap(); // consume the token
 
+                println!("parse_infix() parsed operator {:?} and now calling parse_expr()", op);
+
                 let right = parse_expr(it, precendence).unwrap();
 
                 Ok(Expr::BinaryExpr(
@@ -102,8 +109,8 @@ fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>, precendence: u8) -> Re
 
 }
 
-#[test]
-fn parser_works() {
+//#[test]
+fn parse_plus_then_multiply() {
 
 
     let equation = String::from("123+456*789").tokenize();
@@ -120,5 +127,24 @@ fn parser_works() {
             )
         ))
     ), ast);
+
+}
+
+#[test]
+fn parse_multiply_then_plus() {
+
+    let equation = String::from("123*456+789").tokenize();
+
+    let ast = parse(equation);
+
+    assert_eq!(Ok(Expr::BinaryExpr(
+        Box::new(Expr::BinaryExpr(
+            Box::new(Expr::Integer(123)),
+            Op::Multiply,
+            Box::new(Expr::Integer(456))
+        )),
+        Op::Add,
+        Box::new(Expr::Integer(789))
+    )), ast);
 
 }
