@@ -6,20 +6,20 @@ use std::iter::Iterator;
 use std::iter::Peekable;
 
 #[derive(Debug,PartialEq)]
-enum Expr {
+pub enum Expr {
     Integer(i32),
     BinaryExpr(Box<Expr>, Op, Box<Expr>)
 }
 
 #[derive(Debug,PartialEq)]
-enum Op {
+pub enum Op {
     Add,
     Subtract,
     Multiply,
     Divide
 }
 
-fn parse(tokens: Vec<Token>) -> Result<Expr, String> {
+pub fn parse(tokens: Vec<Token>) -> Result<Expr, String> {
     let mut it = tokens.iter().peekable();
     parse_expr(&mut it, 0)
 }
