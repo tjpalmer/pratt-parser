@@ -5,15 +5,15 @@ use std::str::Chars;
 
 
 #[derive(Debug, PartialEq)]
-enum Symbol {
-    Plus,
-    Minus,
-    Mult,
+pub enum Symbol {
+    Add,
+    Subtract,
+    Multiply,
     Divide
 }
 
 #[derive(Debug, PartialEq)]
-enum Token {
+pub enum Token {
     Integer(i32),
     Operator(Symbol)
 }
@@ -23,13 +23,13 @@ trait Tokenizer {
     fn tokenize(&self) -> Vec<Token>;
 }
 
-fn my_take_while<F>(it: &mut Peekable<Chars>, x: F) -> Vec<char>
+fn consume_while<F>(it: &mut Peekable<Chars>, condition: F) -> Vec<char>
     where F : Fn(char) -> bool {
 
     let mut v: Vec<char> = vec![];
 
     while let Some(&ch) = it.peek() {
-        if x(ch) {
+        if condition(ch) {
             it.next().unwrap();
             v.push(ch);
         } else {
@@ -44,18 +44,16 @@ impl Tokenizer for String {
 
     fn tokenize(&self) -> Vec<Token> {
 
-        // get an iterator over the chars
+        // get a peekable iterator over the chars
         let mut it = self.chars().peekable();
 
         let mut tokens: Vec<Token> = vec![];
 
         loop {
-            // it.peek() returns Option<&Char>
             match it.peek() {
-                // cannot use 'ref ch' but '&ch' works ... why?
                 Some(&ch) => match ch {
                     '0' ... '9' => {
-                        let num: String = my_take_while(&mut it, |a| a.is_numeric())
+                        let num: String = consume_while(&mut it, |a| a.is_numeric())
                             .into_iter()
                             .collect();
                         tokens.push(Token::Integer(num.parse::<i32>().unwrap()));
@@ -63,7 +61,19 @@ impl Tokenizer for String {
                     },
                     '+' => {
                         it.next().unwrap();
-                        tokens.push(Token::Operator(Symbol::Plus))
+                        tokens.push(Token::Operator(Symbol::Add))
+                    },
+                    '-' => {
+                        it.next().unwrap();
+                        tokens.push(Token::Operator(Symbol::Subtract))
+                    },
+                    '*' => {
+                        it.next().unwrap();
+                        tokens.push(Token::Operator(Symbol::Multiply))
+                    },
+                    '/' => {
+                        it.next().unwrap();
+                        tokens.push(Token::Operator(Symbol::Divide))
                     },
                     _ => panic!("invalid char")
                 },
@@ -82,7 +92,7 @@ fn it_works() {
     let equation = String::from("123+456").tokenize();
     assert_eq!(vec![
         Token::Integer(123),
-        Token::Operator(Symbol::Plus),
+        Token::Operator(Symbol::Add),
         Token::Integer(456)
         ], equation);
 

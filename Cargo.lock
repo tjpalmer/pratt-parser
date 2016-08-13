@@ -1,4 +1,4 @@
 [root]
-name = "tokenizer"
+name = "tokenize-and-parse"
 version = "0.1.0"
 

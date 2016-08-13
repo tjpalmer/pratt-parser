@@ -1,4 +1,4 @@
 [package]
-name = "tokenizer"
+name = "tokenize-and-parse"
 version = "0.1.0"
 authors = ["Andy Grove <andygrove73@gmail.com>"]
