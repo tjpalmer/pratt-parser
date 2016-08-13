@@ -19,7 +19,7 @@ pub enum Token {
 }
 
 
-trait Tokenizer {
+pub trait Tokenizer {
     fn tokenize(&self) -> Vec<Token>;
 }
 
@@ -87,7 +87,7 @@ fn consume_while<F>(it: &mut Peekable<Chars>, condition: F) -> Vec<char>
 }
 
 #[test]
-fn it_works() {
+fn tokenizer_works() {
 
     let equation = String::from("123+456").tokenize();
     assert_eq!(vec![

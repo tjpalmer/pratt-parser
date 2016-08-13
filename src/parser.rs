@@ -1,5 +1,6 @@
 use super::tokenizer::Token;
 use super::tokenizer::Symbol;
+use super::tokenizer::Tokenizer;
 
 use std::iter::Iterator;
 use std::iter::Peekable;
@@ -26,7 +27,23 @@ fn parse(tokens: Vec<Token>) -> Result<Expr, String> {
 fn parse_expr<'a, It>(it: &mut Peekable<It>, precendence: u8) -> Result<Expr, String>
     where It: Iterator<Item=&'a Token> {
 
-    parse_prefix(it)
+    let mut expr = parse_prefix(it).unwrap();
+
+    loop {
+        let next_precendence = get_precedence();
+
+        if precendence >= next_precendence {
+            break;
+        }
+
+        expr = parse_infix(expr, it, next_precendence).unwrap();
+    }
+
+    Ok(expr)
+}
+
+fn get_precedence() -> u8 {
+    0
 }
 
 fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, String>
@@ -41,7 +58,7 @@ fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, String>
     }
 }
 
-fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>) -> Result<Expr, String>
+fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>, precendence: u8) -> Result<Expr, String>
     where It: Iterator<Item=&'a Token> {
 
     match it.peek() {
@@ -55,7 +72,7 @@ fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>) -> Result<Expr, String
                     &Symbol::Divide => Op::Divide,
                 };
 
-                let right = parse_expr(it, 0).unwrap();
+                let right = parse_expr(it, precendence).unwrap();
 
                 Ok(Expr::BinaryExpr(
                     Box::new(left),
@@ -66,5 +83,16 @@ fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>) -> Result<Expr, String
         },
         None => Err(String::from("No more tokens"))
     }
+
+}
+
+#[test]
+fn parser_works() {
+
+    let equation = String::from("123+456*789").tokenize();
+
+    let ast = parse(equation);
+
+    println!("AST: {:?}", ast);
 
 }
