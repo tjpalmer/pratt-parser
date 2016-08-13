@@ -23,23 +23,6 @@ trait Tokenizer {
     fn tokenize(&self) -> Vec<Token>;
 }
 
-fn consume_while<F>(it: &mut Peekable<Chars>, condition: F) -> Vec<char>
-    where F : Fn(char) -> bool {
-
-    let mut v: Vec<char> = vec![];
-
-    while let Some(&ch) = it.peek() {
-        if condition(ch) {
-            it.next().unwrap();
-            v.push(ch);
-        } else {
-            break;
-        }
-    }
-
-    v
-}
-
 impl Tokenizer for String {
 
     fn tokenize(&self) -> Vec<Token> {
@@ -84,6 +67,23 @@ impl Tokenizer for String {
         tokens
     }
 
+}
+
+fn consume_while<F>(it: &mut Peekable<Chars>, condition: F) -> Vec<char>
+    where F : Fn(char) -> bool {
+
+    let mut v: Vec<char> = vec![];
+
+    while let Some(&ch) = it.peek() {
+        if condition(ch) {
+            it.next().unwrap();
+            v.push(ch);
+        } else {
+            break;
+        }
+    }
+
+    v
 }
 
 #[test]
