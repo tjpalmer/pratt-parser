@@ -65,10 +65,9 @@ fn parse_expr<'a, It>(it: &mut Peekable<It>, precedence: u8) -> Result<Expr, Str
 fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, String>
     where It: Iterator<Item=&'a Token> {
 
-    match it.peek() {
-        Some(&t) => match t {
+    match it.next() {
+        Some(t) => match t {
             &Token::Integer(n) => {
-                it.next().unwrap(); // consume the token
                 Ok(Expr::Integer(n))
             },
             _ => Err(format!("unexpected token: {:?}", t))
@@ -80,8 +79,8 @@ fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, String>
 fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>, precendence: u8) -> Result<Expr, String>
     where It: Iterator<Item=&'a Token> {
 
-    match it.peek() {
-        Some(&t) => match t {
+    match it.next() {
+        Some(t) => match t {
             &Token::Operator(ref s) => {
 
                 let op = match s {
@@ -90,8 +89,6 @@ fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>, precendence: u8) -> Re
                     &Symbol::Multiply => Op::Multiply,
                     &Symbol::Divide => Op::Divide,
                 };
-
-                it.next().unwrap(); // consume the token
 
                 println!("parse_infix() parsed operator {:?} and now calling parse_expr()", op);
 
@@ -109,7 +106,7 @@ fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>, precendence: u8) -> Re
 
 }
 
-//#[test]
+#[test]
 fn parse_plus_then_multiply() {
 
 
