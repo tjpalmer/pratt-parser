@@ -44,7 +44,7 @@ fn parse_expr<'a, It>(it: &mut Peekable<It>, precedence: u8) -> Result<Expr, Str
 
         let next_precedence = match next_token {
             &Token::Operator(ref symbol) => get_precedence(symbol),
-            _ => panic!("Expected operator after expr")
+            _ => return Err(format!("Expected operator after expr"))
         };
 
         if precedence >= next_precedence {
