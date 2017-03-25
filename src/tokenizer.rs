@@ -20,12 +20,12 @@ pub enum Token {
 
 
 pub trait Tokenizer {
-    fn tokenize(&self) -> Vec<Token>;
+    fn tokenize(&self) -> Result<Vec<Token>, &'static str>;
 }
 
 impl Tokenizer for String {
 
-    fn tokenize(&self) -> Vec<Token> {
+    fn tokenize(&self) -> Result<Vec<Token>, &'static str> {
 
         // get a peekable iterator over the chars
         let mut it = self.chars().peekable();
@@ -58,13 +58,13 @@ impl Tokenizer for String {
                         it.next().unwrap();
                         tokens.push(Token::Operator(Symbol::Divide))
                     },
-                    _ => panic!("invalid char")
+                    _ => return Err("invalid char")
                 },
                 None => break
             }
         }
 
-        tokens
+        Ok(tokens)
     }
 
 }
@@ -89,7 +89,7 @@ fn consume_while<F>(it: &mut Peekable<Chars>, condition: F) -> Vec<char>
 #[test]
 fn tokenizer_works() {
 
-    let equation = String::from("123+456").tokenize();
+    let equation = String::from("123+456").tokenize().unwrap();
     assert_eq!(vec![
         Token::Integer(123),
         Token::Operator(Symbol::Add),

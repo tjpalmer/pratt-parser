@@ -112,7 +112,7 @@ fn parse_plus_then_multiply() {
 
     let equation = String::from("123+456*789").tokenize();
 
-    let ast = parse(equation);
+    let ast = parse(equation.unwrap());
 
     assert_eq!(Ok(Expr::BinaryExpr(
         Box::new(Expr::Integer(123)),
@@ -132,7 +132,7 @@ fn parse_multiply_then_plus() {
 
     let equation = String::from("123*456+789").tokenize();
 
-    let ast = parse(equation);
+    let ast = parse(equation.unwrap());
 
     assert_eq!(Ok(Expr::BinaryExpr(
         Box::new(Expr::BinaryExpr(

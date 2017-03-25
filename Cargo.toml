@@ -1,4 +1,4 @@
 [package]
-name = "tokenize-and-parse"
+name = "pratt-parser-example"
 version = "0.1.0"
 authors = ["Andy Grove <andygrove73@gmail.com>"]
