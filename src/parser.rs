@@ -76,7 +76,7 @@ fn parse_prefix<'a, It>(it: &mut Peekable<It>) -> Result<Expr, String>
     }
 }
 
-fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>, precendence: u8) -> Result<Expr, String>
+fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>, precedence: u8) -> Result<Expr, String>
     where It: Iterator<Item=&'a Token> {
 
     match it.next() {
@@ -92,7 +92,7 @@ fn parse_infix<'a, It>(left: Expr, it: &mut Peekable<It>, precendence: u8) -> Re
 
                 println!("parse_infix() parsed operator {:?} and now calling parse_expr()", op);
 
-                let right = parse_expr(it, precendence).unwrap();
+                let right = parse_expr(it, precedence).unwrap();
 
                 Ok(Expr::BinaryExpr(
                     Box::new(left),
